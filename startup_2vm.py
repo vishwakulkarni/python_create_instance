@@ -12,7 +12,7 @@ import google.oauth2.service_account as service_account
 #
 # Use Google Service Account - See https://google-auth.readthedocs.io/en/latest/reference/google.oauth2.service_account.html#module-google.oauth2.service_account
 #
-credentials = service_account.Credentials.from_service_account_file(filename='service-credentials.json')
+credentials = json.load(os.environ['SERVICE_CREDENTIALS'])
 project = os.getenv('GOOGLE_CLOUD_PROJECT') or 'FILL IN YOUR PROJECT'
 service = googleapiclient.discovery.build('compute', 'v1', credentials=credentials)
 
@@ -47,7 +47,6 @@ def create_instance(compute, project, zone, name, bucket):
             os.path.dirname(__file__), 'startup-script.sh'), 'r').read()
     image_url = "http://storage.googleapis.com/gce-demo-input/photo.jpg"
     image_caption = "Ready for dessert?"
-    service_credentials = os.environ['SERVICE_CREDENTIALS']
     config = {
         'name': name,
         'machineType': machine_type,
@@ -98,9 +97,6 @@ def create_instance(compute, project, zone, name, bucket):
             }, {
                 'key': 'bucket',
                 'value': bucket
-            }, {
-                'key':  'service-credentials',
-                'value' : service_credentials
             }]
         }
     }
