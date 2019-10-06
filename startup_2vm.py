@@ -116,11 +116,31 @@ def list_instances(compute, project, zone):
     result = compute.instances().list(project=project, zone=zone).execute()
     return result['items'] if 'items' in result else None
 
+def set_tag(compute, project_id, zone , instance):
+    # Sets the http and https tags to allow traffic
+	data = compute.instances().get(project=project_id,zone=zone,instance=instance).execute()
+	tags = data ['tags']
+	fingerprint = tags['fingerprint']
+    # Waits for the operation to complete.
+    #body['fingerprint'] = fingerprint
+	body = {
+		'items':[
+			'allow-5000'
+			],
+		'fingerprint': fingerprint
+	}	
+	# Waits for the operation to complete.
+	request = compute.instances().setTags(project=project_id, zone=zone, instance=instance, body=body).execute()
+    #response = request.rensponse()
+    #print(response)
+	#wait_to_complete.wait(compute, project_id, zone, request['name'], 'enabling http and https traffic for ' + instance)
+
 
 project = "wide-journey-251423"
 zone = "us-west1-b"
 instance_name_template = "inside-instance"
 create_instance(service,project,zone,instance_name_template,"instance-1")
+set_tag(service,"wide-journey-251423","us-west1-b","inside-instance")
 
 print("Your running instances are:")
 for instance in list_instances(service, project, 'us-west1-b'):
